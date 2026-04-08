@@ -1,0 +1,13 @@
+#fgroup_id_genaiuse_ai_prefix1_group,
+#fgroup_id_genaiuse_ai_prefix2_group,
+#fgroup_id_genaiuse_ai_prefix3_group,
+#fgroup_id_genaiuse_ai_prefix4_group {
+    padding-bottom: 0;
+}
+
+#fgroup_id_genaiuse_ai_prefix1_group + .fitem,
+#fgroup_id_genaiuse_ai_prefix2_group + .fitem,
+#fgroup_id_genaiuse_ai_prefix3_group + .fitem,
+#fgroup_id_genaiuse_ai_prefix4_group + .fitem {
+    padding-top: 0;
+}

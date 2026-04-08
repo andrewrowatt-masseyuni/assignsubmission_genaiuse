@@ -219,10 +219,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // --- "AI Used" form fields (visible when aiused == 1) ---
 
+        global $OUTPUT;
+
         // Field 1: AI tools used.
         $prefix1group = [];
         $prefix1group[] = $mform->createElement('static', 'genaiuse_ai_prefix1', '',
-            \html_writer::tag('p', get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname)));
+            \html_writer::tag('span', get_string('ai_prefix_tools', 'assignsubmission_genaiuse', $fullname))
+            . $OUTPUT->help_icon('genaiuse_aitoolsused', 'assignsubmission_genaiuse'));
         $mform->addGroup($prefix1group, 'genaiuse_ai_prefix1_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix1_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -234,7 +237,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Field 2: AI use context.
         $prefix2group = [];
         $prefix2group[] = $mform->createElement('static', 'genaiuse_ai_prefix2', '',
-            \html_writer::tag('p', get_string('ai_prefix_context', 'assignsubmission_genaiuse')));
+            \html_writer::tag('span', get_string('ai_prefix_context', 'assignsubmission_genaiuse'))
+            . $OUTPUT->help_icon('genaiuse_aiusecontext', 'assignsubmission_genaiuse'));
         $mform->addGroup($prefix2group, 'genaiuse_ai_prefix2_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix2_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -246,7 +250,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Field 3: AI content description.
         $prefix3group = [];
         $prefix3group[] = $mform->createElement('static', 'genaiuse_ai_prefix3', '',
-            \html_writer::tag('p', get_string('ai_prefix_content', 'assignsubmission_genaiuse')));
+            \html_writer::tag('span', get_string('ai_prefix_content', 'assignsubmission_genaiuse'))
+            . $OUTPUT->help_icon('genaiuse_aicontentdesc', 'assignsubmission_genaiuse'));
         $mform->addGroup($prefix3group, 'genaiuse_ai_prefix3_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix3_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
@@ -258,7 +263,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Field 4: AI modification.
         $prefix4group = [];
         $prefix4group[] = $mform->createElement('static', 'genaiuse_ai_prefix4', '',
-            \html_writer::tag('p', get_string('ai_prefix_modification', 'assignsubmission_genaiuse')));
+            \html_writer::tag('span', get_string('ai_prefix_modification', 'assignsubmission_genaiuse'))
+            . $OUTPUT->help_icon('genaiuse_aimodification', 'assignsubmission_genaiuse'));
         $mform->addGroup($prefix4group, 'genaiuse_ai_prefix4_group', '', '', false);
         $mform->hideIf('genaiuse_ai_prefix4_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 

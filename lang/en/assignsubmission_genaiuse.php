@@ -52,6 +52,16 @@ $string['ai_placeholder_context'] = 'specific use of generative artificial intel
 $string['ai_placeholder_content'] = 'describe content used in task';
 $string['ai_placeholder_modification'] = 'explain use';
 
+// "AI Used" textarea help strings.
+$string['genaiuse_aitoolsused'] = 'AI tools used';
+$string['genaiuse_aitoolsused_help'] = 'List the generative AI tools or systems you used, including links where possible. For example: ChatGPT (https://chat.openai.com), GitHub Copilot.';
+$string['genaiuse_aiusecontext'] = 'AI use context';
+$string['genaiuse_aiusecontext_help'] = 'Describe how you used the generative AI tool(s) in relation to this assessment. For example: brainstorming ideas, generating draft text, checking grammar, writing code.';
+$string['genaiuse_aicontentdesc'] = 'AI content description';
+$string['genaiuse_aicontentdesc_help'] = 'Describe the content that the AI tool(s) provided which you used in your submission. For example: an outline structure, sample paragraphs, code snippets, data analysis.';
+$string['genaiuse_aimodification'] = 'AI output modification';
+$string['genaiuse_aimodification_help'] = 'Explain how you modified or built upon the AI-generated output. For example: rewrote key sections, verified facts and corrected errors, integrated output with original analysis.';
+
 // "AI Used" acknowledgement paragraphs.
 $string['ai_ack_1'] = 'When using AI, I have ensured that the work produced is still my own and I understand that submitting unmodified output from a generative AI tool as my own is NOT acceptable. I understand that I am expected to build on the output, ensuring any submissions are my own ideas and knowledge.';
 $string['ai_ack_2'] = 'I acknowledge awareness of any updates to the generative AI tools used, up to the date of this submission. This includes AI plug-ins or assistants included in existing programs, such as Grammarly. I take responsibility for any fabricated references or factual errors stemming from the use of these tools.';
