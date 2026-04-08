@@ -1,0 +1,82 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * English language pack for Generative AI use statement
+ *
+ * @package    assignsubmission_genaiuse
+ * @category   string
+ * @copyright  2026 Andrew Rowatt <A.J.Rowatt@massey.ac.nz>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['pluginname'] = 'Generative AI use statement';
+$string['enabled'] = 'Generative AI use statement';
+$string['enabled_help'] = 'If enabled, students must declare whether or not they used generative AI tools in the completion of their submission.';
+$string['default'] = 'Enabled by default';
+$string['default_help'] = 'If set, this submission method will be enabled by default for all new assignments.';
+
+// Radio button labels.
+$string['noaiused'] = 'No AI Used';
+$string['aiused'] = 'AI Used';
+
+// "No AI Used" declaration paragraphs.
+$string['noai_declaration_1'] = 'I, {$a}, hereby confirm that I used <strong>no generative AI tools or systems</strong> in the completion of this assessment. I confirm that the document I have submitted was entirely written by me.';
+$string['noai_declaration_2'] = 'I acknowledge that any undeclared use of generative AI will constitute academic dishonesty and will be dealt with according to relevant University policy.';
+$string['noai_declaration_3'] = 'I understand that I will be held accountable for any academic misconduct that arises in breach of any relevant University policy, as well as the consequences of such infringements.';
+
+// "AI Used" declaration prefix labels.
+$string['ai_prefix_tools'] = 'I, {$a}, hereby confirm that I used';
+$string['ai_prefix_context'] = 'to';
+$string['ai_prefix_content'] = 'The tool(s) was/were used to provide';
+$string['ai_prefix_modification'] = 'The output from the tool(s) was/were modified by';
+
+// "AI Used" input placeholders.
+$string['ai_placeholder_tools'] = 'insert AI system(s) and link(s)';
+$string['ai_placeholder_context'] = 'specific use of generative artificial intelligence';
+$string['ai_placeholder_content'] = 'describe content used in task';
+$string['ai_placeholder_modification'] = 'explain use';
+
+// "AI Used" acknowledgement paragraphs.
+$string['ai_ack_1'] = 'When using AI, I have ensured that the work produced is still my own and I understand that submitting unmodified output from a generative AI tool as my own is NOT acceptable. I understand that I am expected to build on the output, ensuring any submissions are my own ideas and knowledge.';
+$string['ai_ack_2'] = 'I acknowledge awareness of any updates to the generative AI tools used, up to the date of this submission. This includes AI plug-ins or assistants included in existing programs, such as Grammarly. I take responsibility for any fabricated references or factual errors stemming from the use of these tools.';
+$string['ai_ack_3'] = 'I have informed myself of the limitations and implications of using generative AI and related technologies, including the reinforcement of biases and propensity for fabrication.';
+$string['ai_ack_4'] = 'I have used these tools ethically, including not uploading confidential, private, personal, copyrighted, or otherwise sensitive information.';
+$string['ai_ack_5'] = 'To assist with maintaining academic integrity, I have appropriately acknowledged any use of generative AI in my work (list below as applicable).';
+$string['ai_ack_6'] = 'I acknowledge that any undeclared use of generative AI will constitute academic dishonesty and will be dealt with according to relevant University policy.';
+$string['ai_ack_7'] = 'I understand that I will be held accountable for any academic misconduct that arises in breach of any relevant University policy, as well as the consequences of such infringements.';
+
+// Supporting evidence section.
+$string['supportingevidence'] = 'Generative AI use statement - supporting evidence';
+
+// Settings.
+$string['maxfiles'] = 'Maximum number of evidence files';
+$string['maxfiles_help'] = 'The maximum number of supporting evidence files that can be uploaded with the generative AI use statement.';
+$string['maxbytes'] = 'Maximum evidence file size';
+$string['maxbytes_help'] = 'The maximum size of each supporting evidence file.';
+
+// View display.
+$string['noaiusedstatement'] = 'No generative AI was used';
+$string['aiusedstatement'] = 'Generative AI was used';
+$string['evidencefiles'] = 'Supporting evidence files';
+
+// View labels.
+$string['ai_tools_used_label'] = 'AI system(s) and link(s)';
+$string['ai_use_context_label'] = 'Specific use';
+$string['ai_content_desc_label'] = 'Content provided by AI';
+$string['ai_modification_label'] = 'How output was modified';

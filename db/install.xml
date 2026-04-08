@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/assign/submission/genaiuse/db" VERSION="20260408" COMMENT="XMLDB file for Moodle mod/assign/submission/genaiuse/db"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="assignsubmission_genaiuse" COMMENT="Stores the generative AI use statement for each submission">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The assignment instance this submission relates to."/>
+        <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The submission this relates to."/>
+        <FIELD NAME="aiused" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether AI was used: 0 = No AI, 1 = AI Used."/>
+        <FIELD NAME="aitoolsused" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="AI system(s) and link(s) used."/>
+        <FIELD NAME="aiusecontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Specific use of generative AI."/>
+        <FIELD NAME="aicontentdesc" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of content used in task from AI tools."/>
+        <FIELD NAME="aimodification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="How the AI output was modified."/>
+        <FIELD NAME="numfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of supporting evidence files."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="The unique id for this record."/>
+        <KEY NAME="assignment" TYPE="foreign" FIELDS="assignment" REFTABLE="assign" REFFIELDS="id"/>
+        <KEY NAME="submission" TYPE="foreign" FIELDS="submission" REFTABLE="assign_submission" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
