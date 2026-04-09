@@ -81,3 +81,5 @@ $string['privacy:metadata:submissionpurpose'] = 'The submission ID that links to
 $string['privacy:metadata:tablepurpose'] = 'Stores the generative AI use declaration for each submission.';
 $string['privacy:path'] = 'Generative AI Use Statement';
 $string['supportingevidence'] = 'Generative AI use statement - supporting evidence';
+$string['supportingevidence_text1'] = '1. Ensure you have saved your drafts, version history, etc., so that you can produce it if your course coordinator requires it.';
+$string['supportingevidence_text2'] = '2. Complete the information in the following blocks (page 3), or as required by your course coordinator, for each tool. Add additional blocks as needed.';

@@ -321,16 +321,29 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addGroup($ackgroup, 'genaiuse_ai_ack_group', '', '', false);
         $mform->hideIf('genaiuse_ai_ack_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
-        // Supporting evidence file upload (visible when aiused == 1).
-        $evidenceheadergroup = [];
-        $evidenceheadergroup[] = $mform->createElement(
+        $mform->addElement(
             'static',
             'genaiuse_evidence_header_text',
             '',
-            \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'))
+            \html_writer::tag('label', get_string('supportingevidence', 'assignsubmission_genaiuse'))
         );
-        $mform->addGroup($evidenceheadergroup, 'genaiuse_evidence_header_group', '', '', false);
-        $mform->hideIf('genaiuse_evidence_header_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+
+        $mform->addElement(
+            'static',
+            'genaiuse_evidence_text1',
+            '',
+            \html_writer::tag('p', get_string('supportingevidence_text1', 'assignsubmission_genaiuse'))
+        );
+
+        $supportingevidencetext2group = [];
+        $supportingevidencetext2group[] = $mform->createElement(
+            'static',
+            'genaiuse_evidence_text2',
+            '',
+            \html_writer::tag('p', get_string('supportingevidence_text2', 'assignsubmission_genaiuse'))
+        );
+        $mform->addGroup($supportingevidencetext2group, 'supportingevidence_text2_group', '', '', false);
+        $mform->hideIf('supportingevidence_text2_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         $fileoptions = $this->get_file_options();
         $submissionid = $submission ? $submission->id : 0;
@@ -346,7 +359,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         );
 
         $mform->addElement('filemanager', 'genaiuse_evidence_filemanager', '', null, $fileoptions);
-        $mform->hideIf('genaiuse_evidence_filemanager', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
         // Conditional validation: require AI detail fields only when AI is used.
         $mform->addFormRule(function ($values) use ($requiredrule) {
