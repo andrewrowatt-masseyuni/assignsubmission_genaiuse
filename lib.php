@@ -49,6 +49,10 @@ function assignsubmission_genaiuse_pluginfile(
         return false;
     }
 
+    if ($filearea !== 'submission_evidence') {
+        return false;
+    }
+
     require_login($course, false, $cm);
     $itemid = (int)array_shift($args);
     $record = $DB->get_record(

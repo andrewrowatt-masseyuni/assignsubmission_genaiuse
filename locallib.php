@@ -479,7 +479,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             return '';
         }
 
-        $user = $DB->get_record('user', ['id' => $submission->userid]);
+        $user = core_user::get_user($submission->userid);
+        if (!$user) {
+            return '';
+        }
         $fullname = fullname($user);
         $result = '';
 
@@ -556,6 +559,14 @@ class assign_submission_genaiuse extends assign_submission_plugin {
      */
     public function delete_instance() {
         global $DB;
+
+        $fs = get_file_storage();
+        $fs->delete_area_files(
+            $this->assignment->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA
+        );
+
         $DB->delete_records(
             'assignsubmission_genaiuse',
             ['assignment' => $this->assignment->get_instance()->id]
@@ -616,10 +627,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     public function get_external_parameters() {
         return [
             'genaiuse_aiused' => new external_value(PARAM_INT, 'Whether AI was used (0 or 1).', VALUE_OPTIONAL),
-            'genaiuse_aitoolsused' => new external_value(PARAM_RAW, 'AI tools used.', VALUE_OPTIONAL),
-            'genaiuse_aiusecontext' => new external_value(PARAM_RAW, 'AI use context.', VALUE_OPTIONAL),
-            'genaiuse_aicontentdesc' => new external_value(PARAM_RAW, 'AI content description.', VALUE_OPTIONAL),
-            'genaiuse_aimodification' => new external_value(PARAM_RAW, 'AI output modification.', VALUE_OPTIONAL),
+            'genaiuse_aitoolsused' => new external_value(PARAM_TEXT, 'AI tools used.', VALUE_OPTIONAL),
+            'genaiuse_aiusecontext' => new external_value(PARAM_TEXT, 'AI use context.', VALUE_OPTIONAL),
+            'genaiuse_aicontentdesc' => new external_value(PARAM_TEXT, 'AI content description.', VALUE_OPTIONAL),
+            'genaiuse_aimodification' => new external_value(PARAM_TEXT, 'AI output modification.', VALUE_OPTIONAL),
         ];
     }
 }

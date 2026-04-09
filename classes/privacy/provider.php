@@ -102,8 +102,8 @@ class provider implements
      * @param assign_plugin_request_data $exportdata Data used to determine which context and user to export.
      */
     public static function export_submission_user_data(assign_plugin_request_data $exportdata) {
-        if ($exportdata->get_user() != null) {
-            return null;
+        if ($exportdata->get_user() === null) {
+            return;
         }
 
         global $DB;
