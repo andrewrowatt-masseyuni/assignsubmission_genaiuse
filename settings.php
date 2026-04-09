@@ -52,3 +52,13 @@ $settings->add(new admin_setting_configselect(
     0,
     get_max_upload_sizes()
 ));
+
+// Tool use template (optional Word document).
+$settings->add(new admin_setting_configstoredfile(
+    'assignsubmission_genaiuse/toolusetemplate',
+    new lang_string('toolusetemplate', 'assignsubmission_genaiuse'),
+    new lang_string('toolusetemplate_help', 'assignsubmission_genaiuse'),
+    'submission_template',
+    0,
+    ['accepted_types' => ['.docx']]
+));

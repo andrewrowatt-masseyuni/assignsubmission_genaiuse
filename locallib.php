@@ -25,6 +25,7 @@
 use core_external\external_value;
 
 define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA', 'submission_evidence');
+define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE', 'submission_template');
 define('ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED', 0);
 define('ASSIGNSUBMISSION_GENAIUSE_AI_USED', 1);
 
@@ -87,6 +88,44 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     }
 
     /**
+     * Get the HTML for the tool use template download link.
+     *
+     * @return string HTML with download link, or empty string if no template.
+     */
+    private function get_template_download_html() {
+        $fs = get_file_storage();
+        $syscontextid = \context_system::instance()->id;
+        $files = $fs->get_area_files(
+            $syscontextid,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE,
+            0,
+            'id',
+            false
+        );
+
+        if (empty($files)) {
+            return '';
+        }
+
+        $file = reset($files);
+        $url = \moodle_url::make_pluginfile_url(
+            $syscontextid,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE,
+            0,
+            $file->get_filepath(),
+            $file->get_filename(),
+            true
+        );
+
+        return \html_writer::tag(
+            'p',
+            \html_writer::link($url, get_string('downloadtemplate', 'assignsubmission_genaiuse') . ' ' . $file->get_filename())
+        );
+    }
+
+    /**
      * Count the number of evidence files for a submission.
      *
      * @param int $submissionid
@@ -135,7 +174,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $options[$i] = $i;
         }
 
-        $name = get_string('maxfiles', 'assignsubmission_genaiuse');
+        $name = get_string('maxfilesassignsettings', 'assignsubmission_genaiuse');
         $mform->addElement('select', 'assignsubmission_genaiuse_maxfiles', $name, $options);
         $mform->addHelpButton('assignsubmission_genaiuse_maxfiles', 'maxfiles', 'assignsubmission_genaiuse');
         $mform->setDefault('assignsubmission_genaiuse_maxfiles', $defaultmaxfiles);
@@ -147,7 +186,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             get_config('assignsubmission_genaiuse', 'maxbytes')
         );
 
-        $name = get_string('maxbytes', 'assignsubmission_genaiuse');
+        $name = get_string('maxbytesassignsettings', 'assignsubmission_genaiuse');
         $mform->addElement('select', 'assignsubmission_genaiuse_maxbytes', $name, $choices);
         $mform->addHelpButton('assignsubmission_genaiuse_maxbytes', 'maxbytes', 'assignsubmission_genaiuse');
         $mform->setDefault('assignsubmission_genaiuse_maxbytes', $defaultmaxbytes);
@@ -345,6 +384,15 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addGroup($supportingevidencetext2group, 'supportingevidence_text2_group', '', '', false);
         $mform->hideIf('supportingevidence_text2_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
 
+        // Tool use template download link.
+        $templatehtml = $this->get_template_download_html();
+        if (!empty($templatehtml)) {
+            $templategroup = [];
+            $templategroup[] = $mform->createElement('static', 'genaiuse_template_link', '', $templatehtml);
+            $mform->addGroup($templategroup, 'genaiuse_template_group', '', '', false);
+            $mform->hideIf('genaiuse_template_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        }
+
         $fileoptions = $this->get_file_options();
         $submissionid = $submission ? $submission->id : 0;
 
@@ -529,6 +577,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 $result .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
             }
             $result .= \html_writer::end_tag('ol');
+
+            // Tool use template download link.
+            $templatehtml = $this->get_template_download_html();
+            if (!empty($templatehtml)) {
+                $result .= $templatehtml;
+            }
 
             if ($record->numfiles > 0) {
                 $result .= \html_writer::tag('h4', get_string('supportingevidence', 'assignsubmission_genaiuse'));

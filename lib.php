@@ -45,15 +45,34 @@ function assignsubmission_genaiuse_pluginfile(
 ) {
     global $DB, $CFG;
 
+    if ($filearea !== 'submission_evidence' && $filearea !== 'submission_template') {
+        return false;
+    }
+
+    if ($filearea === 'submission_template') {
+        // System-wide template file — accessible to any logged-in user.
+        require_login();
+        $itemid = (int)array_shift($args);
+        $relativepath = implode('/', $args);
+        $syscontextid = context_system::instance()->id;
+        $fullpath = "/{$syscontextid}/assignsubmission_genaiuse/$filearea/$itemid/$relativepath";
+
+        $fs = get_file_storage();
+        if (!($file = $fs->get_file_by_hash(sha1($fullpath))) || $file->is_directory()) {
+            return false;
+        }
+
+        send_stored_file($file, 0, 0, true, $options);
+        return;
+    }
+
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
 
-    if ($filearea !== 'submission_evidence') {
-        return false;
-    }
-
     require_login($course, false, $cm);
+    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+
     $itemid = (int)array_shift($args);
     $record = $DB->get_record(
         'assign_submission',
@@ -63,8 +82,6 @@ function assignsubmission_genaiuse_pluginfile(
     );
     $userid = $record->userid;
     $groupid = $record->groupid;
-
-    require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
     $assign = new assign($context, $cm, $course);
 
