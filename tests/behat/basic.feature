@@ -32,6 +32,15 @@ Feature: Basic tests for Generative AI use statement
     And I should see "assignsubmission_genaiuse"
 
   @javascript
+  Scenario: No AI use option is selected by default on a new submission
+    Given I am on the "Test assignment" Activity page logged in as student1
+    When I press "Add submission"
+    Then the "checked" attribute of "#id_genaiuse_aiused_0" "css_element" should not be set
+    And the "checked" attribute of "#id_genaiuse_aiused_1" "css_element" should not be set
+    And I should not see "I acknowledge that any undeclared use of generative AI"
+    And I should not see "When using AI, I have ensured that the work produced"
+
+  @javascript
   Scenario: Student submits assignment declaring no AI was used
     Given I am on the "Test assignment" Activity page logged in as student1
     When I press "Add submission"
