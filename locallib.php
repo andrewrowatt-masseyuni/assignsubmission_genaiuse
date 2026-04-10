@@ -258,7 +258,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         // Declaration text visible when aiused == 0.
         $noaidecl = '';
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname), ['class' => 'ml-5']);
+        $noaidecl .= \html_writer::tag(
+            'p',
+            get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname),
+            ['class' => 'ml-5']
+        );
         $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'), ['class' => 'ml-5']);
         $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'), ['class' => 'ml-5']);
 
@@ -266,8 +270,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $noaigroup[] = $mform->createElement('static', 'genaiuse_noai_text', '', $noaidecl);
         $mform->addGroup($noaigroup, 'genaiuse_noai_group', '', '', false);
         $mform->hideIf('genaiuse_noai_group', 'genaiuse_aiused', 'notchecked', (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
-
-
 
         // Set default/existing value.
         if ($existingrecord) {
@@ -393,7 +395,12 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             \html_writer::tag('p', get_string('supportingevidence_text2', 'assignsubmission_genaiuse'))
         );
         $mform->addGroup($supportingevidencetext2group, 'supportingevidence_text2_group', '', '', false);
-        $mform->hideIf('supportingevidence_text2_group', 'genaiuse_aiused', 'notchecked', (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED);
+        $mform->hideIf(
+            'supportingevidence_text2_group',
+            'genaiuse_aiused',
+            'notchecked',
+            (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED
+        );
 
         // Tool use template download link.
         $templatehtml = $this->get_template_download_html();
@@ -585,7 +592,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
             $result .= \html_writer::start_tag('ol', ['class' => 'genaiuse_acknowledgement']);
             for ($i = 1; $i <= 7; $i++) {
-                $result .= \html_writer::tag('li', get_string('ai_ack_' . $i, 'assignsubmission_genaiuse'));
+                $result .= \html_writer::tag('li', get_string(
+                    'ai_ack_' . $i,
+                    'assignsubmission_genaiuse'
+                ));
             }
             $result .= \html_writer::end_tag('ol');
 
@@ -709,5 +719,20 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'genaiuse_aicontentdesc' => new external_value(PARAM_TEXT, 'AI content description.', VALUE_OPTIONAL),
             'genaiuse_aimodification' => new external_value(PARAM_TEXT, 'AI output modification.', VALUE_OPTIONAL),
         ];
+    }
+
+    /**
+     * Return HTML to display in the view assignment page.
+     *
+     * Returns the site-wide pre-submission information
+     * or guidance configured by the administrator,
+     * or an empty string if none has been set.
+     * This is displayed on mod/assign/view/php.
+     *
+     * @return string
+     */
+    public function view_header() {
+        $presubmissioninformation = get_config('assignsubmission_genaiuse', 'presubmissioninformation');
+        return $presubmissioninformation ?: '';
     }
 }

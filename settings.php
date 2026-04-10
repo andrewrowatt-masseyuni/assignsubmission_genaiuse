@@ -53,6 +53,14 @@ $settings->add(new admin_setting_configselect(
     get_max_upload_sizes()
 ));
 
+// Pre-submission information for students.
+$settings->add(new admin_setting_confightmleditor(
+    'assignsubmission_genaiuse/presubmissioninformation',
+    new lang_string('presubmissioninformation', 'assignsubmission_genaiuse'),
+    new lang_string('presubmissioninformation_help', 'assignsubmission_genaiuse'),
+    ''
+));
+
 // Tool use template (optional Word document).
 $settings->add(new admin_setting_configstoredfile(
     'assignsubmission_genaiuse/toolusetemplate',
