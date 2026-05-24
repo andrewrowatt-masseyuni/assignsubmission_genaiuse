@@ -211,11 +211,19 @@
     .mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
     .mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
     .mform #fitem_id_genaiuse_aimodification > .col-md-3,
+    .mform #fitem_id_genaiuse_aitoolsused_hint > .col-md-3,
+    .mform #fitem_id_genaiuse_aiusecontext_hint > .col-md-3,
+    .mform #fitem_id_genaiuse_aicontentdesc_hint > .col-md-3,
+    .mform #fitem_id_genaiuse_aimodification_hint > .col-md-3,
     .mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
     .mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
     .mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
     .mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
     .mform #fitem_id_genaiuse_aimodification > .col-md-9,
+    .mform #fitem_id_genaiuse_aitoolsused_hint > .col-md-9,
+    .mform #fitem_id_genaiuse_aiusecontext_hint > .col-md-9,
+    .mform #fitem_id_genaiuse_aicontentdesc_hint > .col-md-9,
+    .mform #fitem_id_genaiuse_aimodification_hint > .col-md-9,
     .mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
         flex: 0 0 75%;
         max-width: 75%;
@@ -225,6 +233,42 @@
 
 .mform .submission_genaiuse_aifield_label {
     font-weight: 500;
+}
+
+.mform .submission_genaiuse_aifield_hint {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.65);
+    line-height: 1.4;
+    border-left: 1px dashed #ced4da;
+    padding-left: 0.4rem;
+}
+
+/* Pull the hint up against its textarea — the field fitem's default
+   form-group margin-bottom (1rem) otherwise leaves an unwanted gap that
+   reads as separation rather than association. */
+.mform #fitem_id_genaiuse_aitoolsused_hint,
+.mform #fitem_id_genaiuse_aiusecontext_hint,
+.mform #fitem_id_genaiuse_aicontentdesc_hint,
+.mform #fitem_id_genaiuse_aimodification_hint {
+    margin-top: -0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Stretch the four AI textareas to the full width of the card body. The
+   parent .felement carries Bootstrap's .form-inline, which forces
+   .form-control to width: auto and falls back to the textarea's cols="60"
+   default — overriding back to 100% lets the field reach the right edge. */
+.mform #fitem_id_genaiuse_aitoolsused .form-control,
+.mform #fitem_id_genaiuse_aiusecontext .form-control,
+.mform #fitem_id_genaiuse_aicontentdesc .form-control,
+.mform #fitem_id_genaiuse_aimodification .form-control {
+    width: 100%;
+    /* Auto-grow from one row (rows="1" on the textarea) to a cap of five rows,
+       after which the native vertical scrollbar handles overflow. Unsupported
+       browsers (currently Safari) keep the fixed one-row height. */
+    /* stylelint-disable-next-line csstree/validator */ /* stylelint-disable-next-line property-no-unknown */
+    field-sizing: content;
+    max-height: calc(5lh + 0.75rem);
 }
 
 /* No-label row utility — apply by passing

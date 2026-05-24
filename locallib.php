@@ -471,14 +471,20 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ['class' => 'submission_genaiuse_aifield_label']
             );
             $mform->addElement('textarea', $name, $label, [
-                'rows' => 2,
+                'rows' => 1,
                 'cols' => 60,
                 'placeholder' => get_string($placeholderkey, 'assignsubmission_genaiuse'),
             ]);
             $mform->setType($name, PARAM_TEXT);
-            $mform->addHelpButton($name, $name, 'assignsubmission_genaiuse');
             $mform->hideIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
             $mform->disabledIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
+
+            $hint = \html_writer::div(
+                get_string($name . '_help', 'assignsubmission_genaiuse'),
+                'submission_genaiuse_aifield_hint'
+            );
+            $mform->addElement('static', $name . '_hint', '', $hint);
+            $mform->hideIf($name . '_hint', 'genaiuse_aiused', 'neq', $aiusedstr);
         }
 
         $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
