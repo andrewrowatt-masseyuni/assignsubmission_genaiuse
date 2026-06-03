@@ -147,6 +147,21 @@
     outline-offset: 2px;
 }
 
+/* Disabled radio card (e.g. the "No" option when a OneDrive link is required). We cannot rely on a
+   `disabled` attribute on the input: Moodle's form dependency JS treats the surrounding hideIf group
+   as a lock target and strips `disabled` the moment it shows the group (lib/form/form.js
+   _disableElement). So the card is marked with this class instead — pointer-events: none stops the
+   label click from toggling the radio, and the greyed-out look signals it is not selectable.
+   Submission is still blocked server-side by the required-link rule in locallib.php. */
+.mform .submission_genaiuse_radiocards label.form-check-inline.submission_genaiuse_radiocard_disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    pointer-events: none;
+    border-color: rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.03);
+    box-shadow: none;
+}
+
 /* Visually hide the radio inputs themselves — keep them focusable for keyboard users. */
 .mform .submission_genaiuse_radiocards label.form-check-inline input[type="radio"] {
     position: absolute;
