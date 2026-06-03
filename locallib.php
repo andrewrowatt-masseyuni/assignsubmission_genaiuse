@@ -29,6 +29,9 @@ define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TEMPLATE', 'submission_template');
 define('ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE', 'submission_tooluse');
 define('ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED', 0);
 define('ASSIGNSUBMISSION_GENAIUSE_AI_USED', 1);
+define('ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED', 0);
+define('ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_OPTIONAL', 1);
+define('ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED', 2);
 
 /**
  * Library class for generative AI use statement submission plugin.
@@ -281,11 +284,19 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // Per-assignment: enable OneDrive link field on the submission form.
         $defaultonedrive = $this->assignment->has_instance()
             ? $this->get_config('onedrivelinkenabled')
-            : 0;
+            : ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED;
+        $onedrivechoices = [
+            ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED => get_string('no'),
+            ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_OPTIONAL =>
+                get_string('onedrivelink_enabled_optional', 'assignsubmission_genaiuse'),
+            ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED =>
+                get_string('onedrivelink_enabled_required', 'assignsubmission_genaiuse'),
+        ];
         $mform->addElement(
-            'selectyesno',
+            'select',
             'assignsubmission_genaiuse_onedrivelink',
-            get_string('onedrivelink_enabled', 'assignsubmission_genaiuse')
+            get_string('onedrivelink_enabled', 'assignsubmission_genaiuse'),
+            $onedrivechoices
         );
         $mform->addHelpButton(
             'assignsubmission_genaiuse_onedrivelink',
@@ -735,13 +746,17 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('html', '</div></div>');
 
-        // Card 4: OneDrive link (optional, only when enabled on the assignment).
-        if (!empty($this->get_config('onedrivelinkenabled'))) {
+        // Card 4: OneDrive link (optional or required, only when enabled on the assignment).
+        $onedrivesetting = (int)$this->get_config('onedrivelinkenabled');
+        if ($onedrivesetting > ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED) {
+            $onedriverequired = ($onedrivesetting === ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED);
+            $cardclass = $onedriverequired ? 'submission_genaiuse_card_required' : 'submission_genaiuse_card_optional';
+            $cardbadge = $onedriverequired ? $requiredbadge : $optionalbadge;
             $mform->addElement(
                 'html',
-                '<div class="card submission_genaiuse_card submission_genaiuse_card_optional'
+                '<div class="card submission_genaiuse_card ' . $cardclass
                 . ' submission_genaiuse_card_collapsible mb-3">'
-                . $cardheader(get_string('onedrive', 'assignsubmission_genaiuse'), $optionalbadge)
+                . $cardheader(get_string('onedrive', 'assignsubmission_genaiuse'), $cardbadge)
                 . '<div class="card-body">'
             );
 
@@ -757,6 +772,7 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ),
                 'yes'
             );
+            $noradioattrs = $onedriverequired ? ['disabled' => 'disabled'] : [];
             $onedrivechoiceradios[] = $mform->createElement(
                 'radio',
                 'genaiuse_onedrivelink_choice',
@@ -765,7 +781,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                     get_string('onedrivelink_no_title', 'assignsubmission_genaiuse'),
                     get_string('onedrivelink_no_helper', 'assignsubmission_genaiuse')
                 ),
-                'no'
+                'no',
+                $noradioattrs
             );
             $mform->addGroup(
                 $onedrivechoiceradios,
@@ -816,6 +833,8 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             if ($existingrecord) {
                 $legacychoice = empty($existingrecord->onedrivelink) ? '' : 'yes';
                 $data->genaiuse_onedrivelink_choice = $existingrecord->onedrivelinkchoice ?: $legacychoice;
+            } else if ($onedriverequired) {
+                $mform->setDefault('genaiuse_onedrivelink_choice', 'yes');
             } else {
                 $mform->setDefault('genaiuse_onedrivelink_choice', '');
             }
@@ -827,8 +846,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         // selected tool use method must include content (non-empty editor text or at least
         // one uploaded file). The acknowledgement, evidence, and OneDrive choice fields are
         // required whenever an aiused option has been picked.
-        $onedriveenabled = !empty($this->get_config('onedrivelinkenabled'));
-        $mform->addFormRule(function ($values) use ($requiredrule, $onedriveenabled) {
+        $onedrivesettingval = (int)$this->get_config('onedrivelinkenabled');
+        $onedriveenabled = $onedrivesettingval > ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED;
+        $onedriverequiredval = $onedrivesettingval === ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED;
+        $mform->addFormRule(function ($values) use ($requiredrule, $onedriveenabled, $onedriverequiredval) {
             $errors = [];
             $aiused = $values['genaiuse_aiused'] ?? '';
             if ((int)$aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
@@ -873,6 +894,10 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 if ($onedriveenabled && empty($values['genaiuse_onedrivelink_choice'])) {
                     $errors['genaiuse_onedrivelink_choice_group'] =
                         get_string('onedrivelink_choice_required', 'assignsubmission_genaiuse');
+                }
+                if ($onedriverequiredval && empty(trim($values['genaiuse_onedrivelink'] ?? ''))) {
+                    $errors['genaiuse_onedrivelink_group'] =
+                        get_string('onedrivelink_required', 'assignsubmission_genaiuse');
                 }
             }
             return empty($errors) ? true : $errors;
