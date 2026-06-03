@@ -10,10 +10,6 @@
         <FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The assignment instance this submission relates to."/>
         <FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The submission this relates to."/>
         <FIELD NAME="aiused" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether AI was used: 0 = No AI, 1 = AI Used."/>
-        <FIELD NAME="aitoolsused" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="AI system(s) and link(s) used."/>
-        <FIELD NAME="aiusecontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Specific use of generative AI."/>
-        <FIELD NAME="aicontentdesc" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of content used in task from AI tools."/>
-        <FIELD NAME="aimodification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="How the AI output was modified."/>
         <FIELD NAME="numfiles" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of supporting evidence files."/>
         <FIELD NAME="evidencechoice" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Student answer to the supporting-evidence Yes/No question: 'yes', 'no', or NULL when not chosen."/>
         <FIELD NAME="onedrivelink" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="Optional OneDrive link to the student's final submission."/>

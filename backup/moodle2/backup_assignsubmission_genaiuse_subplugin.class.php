@@ -34,8 +34,7 @@ class backup_assignsubmission_genaiuse_subplugin extends backup_subplugin {
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
 
         $subpluginelement = new backup_nested_element('submission_genaiuse', null, [
-            'submission', 'aiused', 'aitoolsused', 'aiusecontext',
-            'aicontentdesc', 'aimodification', 'numfiles', 'evidencechoice',
+            'submission', 'aiused', 'numfiles', 'evidencechoice',
             'onedrivelink', 'onedrivelinkchoice', 'tooluse',
         ]);
 

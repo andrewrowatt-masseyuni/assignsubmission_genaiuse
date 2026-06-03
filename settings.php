@@ -66,20 +66,20 @@ $settings->add(new admin_setting_confightmleditor(
 
 // AI use acknowledgement content shown on the submission form when AI use is declared.
 $settings->add(new admin_setting_confightmleditor(
-    'assignsubmission_genaiuse/genaiuse_aiuseacknowledgementextra',
-    new lang_string('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse'),
-    new lang_string('genaiuse_aiuseacknowledgementextra_help', 'assignsubmission_genaiuse'),
+    'assignsubmission_genaiuse/aiuseacknowledgementaiused',
+    new lang_string('aiuseacknowledgementaiused', 'assignsubmission_genaiuse'),
+    new lang_string('aiuseacknowledgementaiused_help', 'assignsubmission_genaiuse'),
     '',
     PARAM_RAW,
     '',
     '20'
 ));
 
-// AI use acknowledgement content shown on the submission form when AI use is declared.
+// AI use acknowledgement content shown on the submission form when no AI use is declared.
 $settings->add(new admin_setting_confightmleditor(
-    'assignsubmission_genaiuse/genaiuse_aiuseacknowledgementextra',
-    new lang_string('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse'),
-    new lang_string('genaiuse_aiuseacknowledgementextra_help', 'assignsubmission_genaiuse'),
+    'assignsubmission_genaiuse/aiuseacknowledgementnoai',
+    new lang_string('aiuseacknowledgementnoai', 'assignsubmission_genaiuse'),
+    new lang_string('aiuseacknowledgementnoai_help', 'assignsubmission_genaiuse'),
     '',
     PARAM_RAW,
     '',

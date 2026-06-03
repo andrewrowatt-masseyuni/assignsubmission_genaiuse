@@ -23,10 +23,6 @@
 
     Context variables required for this template:
     * aiused - bool, true when the student declared AI was used.
-    * aitoolsused - string (already escaped), AI systems and links used.
-    * aiusecontext - string (already escaped), specific use of AI.
-    * aicontentdesc - string (already escaped), content provided by AI.
-    * aimodification - string (already escaped), how output was modified.
     * hastooluse - bool, true when there is a rich text tool use block.
     * tooluseformatted - string (raw HTML), formatted tool use rich text.
     * toolusefiles - string (raw HTML), file list for tool use file area.
@@ -44,10 +40,6 @@
     Example context (json):
     {
         "aiused": true,
-        "aitoolsused": "ChatGPT (https://chat.openai.com)",
-        "aiusecontext": "brainstorming ideas and generating draft text",
-        "aicontentdesc": "an outline structure and sample paragraphs",
-        "aimodification": "rewrote key sections and verified facts",
         "hastooluse": true,
         "tooluseformatted": "<p>Tool use details...</p>",
         "toolusefiles": "",
@@ -70,16 +62,7 @@
         </div>
         <div class="card-body">
             {{#aiused}}
-                <dl class="genaiuse_view_dl">
-                    <dt>{{#str}}ai_tools_used_label, assignsubmission_genaiuse{{/str}}:</dt>
-                    <dd>{{aitoolsused}}</dd>
-                    <dt>{{#str}}ai_use_context_label, assignsubmission_genaiuse{{/str}}:</dt>
-                    <dd>{{aiusecontext}}</dd>
-                    <dt>{{#str}}ai_content_desc_label, assignsubmission_genaiuse{{/str}}:</dt>
-                    <dd>{{aicontentdesc}}</dd>
-                    <dt>{{#str}}ai_modification_label, assignsubmission_genaiuse{{/str}}:</dt>
-                    <dd>{{aimodification}}</dd>
-                </dl>
+                <p class="mb-0">{{#str}}aiusedstatement, assignsubmission_genaiuse{{/str}}</p>
             {{/aiused}}
             {{^aiused}}
                 <p class="mb-0">{{#str}}noaiused, assignsubmission_genaiuse{{/str}}</p>
