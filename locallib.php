@@ -772,7 +772,15 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 ),
                 'yes'
             );
-            $noradioattrs = $onedriverequired ? ['disabled' => 'disabled'] : [];
+            // When a link is required, the "No" option must not be selectable. A static `disabled`
+            // attribute does not survive here: Moodle's form dependency JS owns the lock state of this
+            // hideIf group and strips `disabled` when it reveals the group (see lib/form/form.js
+            // _disableElement). Instead mark the card so styles.css can disable it via pointer-events,
+            // and set aria-disabled for assistive tech. The required-link form rule below is the real
+            // guard server-side.
+            $noradioattrs = $onedriverequired
+                ? ['class' => 'submission_genaiuse_radiocard_disabled', 'aria-disabled' => 'true']
+                : [];
             $onedrivechoiceradios[] = $mform->createElement(
                 'radio',
                 'genaiuse_onedrivelink_choice',
