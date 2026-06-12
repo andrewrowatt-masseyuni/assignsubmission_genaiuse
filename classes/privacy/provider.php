@@ -57,10 +57,6 @@ class provider implements
             'assignment' => 'privacy:metadata:assignmentid',
             'submission' => 'privacy:metadata:submissionpurpose',
             'aiused' => 'privacy:metadata:aiused',
-            'aitoolsused' => 'privacy:metadata:aitoolsused',
-            'aiusecontext' => 'privacy:metadata:aiusecontext',
-            'aicontentdesc' => 'privacy:metadata:aicontentdesc',
-            'aimodification' => 'privacy:metadata:aimodification',
             'evidencechoice' => 'privacy:metadata:evidencechoice',
             'onedrivelink' => 'privacy:metadata:onedrivelink',
             'onedrivelinkchoice' => 'privacy:metadata:onedrivelinkchoice',
@@ -122,10 +118,6 @@ class provider implements
         if ($record) {
             $submissiondata = new \stdClass();
             $submissiondata->aiused = $record->aiused;
-            $submissiondata->aitoolsused = $record->aitoolsused ?? '';
-            $submissiondata->aiusecontext = $record->aiusecontext ?? '';
-            $submissiondata->aicontentdesc = $record->aicontentdesc ?? '';
-            $submissiondata->aimodification = $record->aimodification ?? '';
             $submissiondata->evidencechoice = $record->evidencechoice ?? '';
             $submissiondata->onedrivelink = $record->onedrivelink ?? '';
             $submissiondata->onedrivelinkchoice = $record->onedrivelinkchoice ?? '';

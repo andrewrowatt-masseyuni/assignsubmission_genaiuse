@@ -309,6 +309,34 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             'assignsubmission_genaiuse_enabled',
             'notchecked'
         );
+
+        // Per-assignment: require students to acknowledge OneDrive link sharing and version history.
+        // Disabled (No) by default and only relevant once a OneDrive link is enabled. The two hideIf
+        // rules are OR'd by Moodle, so the dropdown shows only when the plugin is enabled AND OneDrive
+        // link is set to a "Yes" value (i.e. not the DISABLED option).
+        $mform->addElement(
+            'select',
+            'assignsubmission_genaiuse_onedrivehistoryack',
+            get_string('onedrivehistoryack', 'assignsubmission_genaiuse'),
+            [0 => get_string('no'), 1 => get_string('yes')]
+        );
+        $mform->addHelpButton(
+            'assignsubmission_genaiuse_onedrivehistoryack',
+            'onedrivehistoryack',
+            'assignsubmission_genaiuse'
+        );
+        $mform->setDefault('assignsubmission_genaiuse_onedrivehistoryack', 0);
+        $mform->hideIf(
+            'assignsubmission_genaiuse_onedrivehistoryack',
+            'assignsubmission_genaiuse_enabled',
+            'notchecked'
+        );
+        $mform->hideIf(
+            'assignsubmission_genaiuse_onedrivehistoryack',
+            'assignsubmission_genaiuse_onedrivelink',
+            'eq',
+            ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED
+        );
     }
 
     /**
@@ -326,6 +354,9 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         }
         if (isset($data->assignsubmission_genaiuse_onedrivelink)) {
             $this->set_config('onedrivelinkenabled', $data->assignsubmission_genaiuse_onedrivelink);
+        }
+        if (isset($data->assignsubmission_genaiuse_onedrivehistoryack)) {
+            $this->set_config('onedrivehistoryack', $data->assignsubmission_genaiuse_onedrivehistoryack);
         }
         return true;
     }
@@ -383,11 +414,11 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             )
         );
 
-        // Card 1: Generative AI use declaration (always visible, required).
+        // Card 1: AI Use (always visible, required) — just the AI Used / No AI Used choice.
         $mform->addElement(
             'html',
             '<div class="card submission_genaiuse_card submission_genaiuse_card_required mb-3">'
-            . $cardheader(get_string('genaiuse_declaration', 'assignsubmission_genaiuse'), $requiredbadge)
+            . $cardheader(get_string('genaiuse_aiuse', 'assignsubmission_genaiuse'), $requiredbadge)
             . '<div class="card-body">'
         );
 
@@ -428,31 +459,16 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $mform->addGroup(
             $radioarray,
             'genaiuse_aiused_group',
-            get_string('genaiuse_declaration', 'assignsubmission_genaiuse'),
+            get_string('genaiuse_aiuse', 'assignsubmission_genaiuse'),
             '',
             false,
             ['class' => 'submission_genaiuse_radiocards']
         );
         $mform->addRule('genaiuse_aiused_group', get_string('required'), 'required', null, 'client');
 
-        // Declaration text visible when aiused == 0.
-        $noaidecl = '';
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_1', 'assignsubmission_genaiuse', $fullname));
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_2', 'assignsubmission_genaiuse'));
-        $noaidecl .= \html_writer::tag('p', get_string('noai_declaration_3', 'assignsubmission_genaiuse'));
-
-        $noaigroup = [];
-        $noaigroup[] = $mform->createElement('static', 'genaiuse_noai_text', '', $noaidecl);
-        $mform->addGroup($noaigroup, 'genaiuse_noai_group', '', '', false);
-        $mform->hideIf('genaiuse_noai_group', 'genaiuse_aiused', 'neq', (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED);
-
         // Set default/existing value.
         if ($existingrecord) {
             $data->genaiuse_aiused = (string)$existingrecord->aiused;
-            $data->genaiuse_aitoolsused = $existingrecord->aitoolsused ?? '';
-            $data->genaiuse_aiusecontext = $existingrecord->aiusecontext ?? '';
-            $data->genaiuse_aicontentdesc = $existingrecord->aicontentdesc ?? '';
-            $data->genaiuse_aimodification = $existingrecord->aimodification ?? '';
             $data->genaiuse_onedrivelink = $existingrecord->onedrivelink ?? '';
             // Pre-tick the acknowledgement on edit — required for both AI use options.
             $data->genaiuse_ack_confirmed = 1;
@@ -462,64 +478,13 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->setDefault('genaiuse_aiused', '');
         }
 
-        $requiredrule = get_string('fieldrequired', 'assignsubmission_genaiuse');
         $aiusedstr = (string)ASSIGNSUBMISSION_GENAIUSE_AI_USED;
 
-        // AI-used details: each textarea is its own top-level element so the standard mform renderer
-        // emits an inline error slot (#id_error_<name>) and applies the is-invalid border. The prose
-        // prefix becomes the field label; CSS in styles.css stacks the label above the textarea and
-        // makes the row span the full card body.
-        $aifields = [
-            ['genaiuse_aitoolsused', 'ai_prefix_tools', 'ai_placeholder_tools', $fullname],
-            ['genaiuse_aiusecontext', 'ai_prefix_context', 'ai_placeholder_context', null],
-            ['genaiuse_aicontentdesc', 'ai_prefix_content', 'ai_placeholder_content', null],
-            ['genaiuse_aimodification', 'ai_prefix_modification', 'ai_placeholder_modification', null],
-        ];
-        foreach ($aifields as [$name, $labelkey, $placeholderkey, $labelarg]) {
-            $label = \html_writer::tag(
-                'span',
-                get_string($labelkey, 'assignsubmission_genaiuse', $labelarg),
-                ['class' => 'submission_genaiuse_aifield_label']
-            );
-            $mform->addElement('textarea', $name, $label, [
-                'rows' => 1,
-                'cols' => 60,
-                'placeholder' => get_string($placeholderkey, 'assignsubmission_genaiuse'),
-            ]);
-            $mform->setType($name, PARAM_TEXT);
-            $mform->hideIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
-            $mform->disabledIf($name, 'genaiuse_aiused', 'neq', $aiusedstr);
-
-            $hint = \html_writer::div(
-                get_string($name . '_help', 'assignsubmission_genaiuse'),
-                'submission_genaiuse_aifield_hint'
-            );
-            $mform->addElement('static', $name . '_hint', '', $hint);
-            $mform->hideIf($name . '_hint', 'genaiuse_aiused', 'neq', $aiusedstr);
-        }
-
-        $ackcontent = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
-        if ((string)$ackcontent !== '') {
-            $mform->addElement('static', 'genaiuse_ai_ack_text', '', $ackcontent);
-            $mform->hideIf('genaiuse_ai_ack_text', 'genaiuse_aiused', 'neq', $aiusedstr);
-        }
-
-        // Required acknowledgement checkbox — top-level so its inline error displays correctly.
-        // Shown for both AI Used and No AI Used; hidden only until the user picks one.
-        $mform->addElement(
-            'advcheckbox',
-            'genaiuse_ack_confirmed',
-            '',
-            get_string('ack_confirm', 'assignsubmission_genaiuse'),
-            ['class' => 'submission_genaiuse_full_row']
-        );
-        $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
-        $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'eq', '');
-
-        // Close declaration card (card-body + card).
+        // Close the AI Use card.
         $mform->addElement('html', '</div></div>');
 
-        // Card 2: Tool use (required when AI used).
+        // Card 2: Tool use (required, collapses until "AI Used" is chosen). Every element below
+        // keeps hideIf aiused neq '1', so on the No-AI path the whole card auto-hides.
         $mform->addElement(
             'html',
             '<div class="card submission_genaiuse_card submission_genaiuse_card_required'
@@ -667,9 +632,199 @@ class assign_submission_genaiuse extends assign_submission_plugin {
             $mform->setDefault('genaiuse_tooluse_method', '');
         }
 
+        // Close the Tool use card.
         $mform->addElement('html', '</div></div>');
 
-        // Card 3: Supporting evidence (optional). Yes/No radio cards reveal the file manager.
+        // Card 3: Declaration (required, collapses until an AI-use option is chosen).
+        $mform->addElement(
+            'html',
+            '<div class="card submission_genaiuse_card submission_genaiuse_card_required'
+            . ' submission_genaiuse_card_collapsible mb-3">'
+            . $cardheader(get_string('genaiuse_declaration', 'assignsubmission_genaiuse'), $requiredbadge)
+            . '<div class="card-body">'
+        );
+
+        // Acknowledgement content differs by branch; each is sitewide-configurable, supports a
+        // {fullname} token replaced with the submitting user's name, and is only shown when set.
+        $ackaiused = str_replace(
+            '{fullname}',
+            s($fullname),
+            (string)get_config('assignsubmission_genaiuse', 'aiuseacknowledgementaiused')
+        );
+        if ($ackaiused !== '') {
+            $mform->addElement('static', 'genaiuse_ai_ack_text', '', $ackaiused);
+            $mform->hideIf('genaiuse_ai_ack_text', 'genaiuse_aiused', 'neq', $aiusedstr);
+        }
+        $acknoai = str_replace(
+            '{fullname}',
+            s($fullname),
+            (string)get_config('assignsubmission_genaiuse', 'aiuseacknowledgementnoai')
+        );
+        if ($acknoai !== '') {
+            $mform->addElement('static', 'genaiuse_noai_ack_text', '', $acknoai);
+            $mform->hideIf(
+                'genaiuse_noai_ack_text',
+                'genaiuse_aiused',
+                'neq',
+                (string)ASSIGNSUBMISSION_GENAIUSE_AI_NOT_USED
+            );
+        }
+
+        // Required acknowledgement checkbox — shown for both AI Used and No AI Used once a choice
+        // is made (hidden only until then).
+        $mform->addElement(
+            'advcheckbox',
+            'genaiuse_ack_confirmed',
+            '',
+            get_string('ack_confirm', 'assignsubmission_genaiuse'),
+            ['class' => 'submission_genaiuse_full_row']
+        );
+        $mform->setType('genaiuse_ack_confirmed', PARAM_INT);
+        $mform->hideIf('genaiuse_ack_confirmed', 'genaiuse_aiused', 'eq', '');
+
+        // Close declaration card (card-body + card).
+        $mform->addElement('html', '</div></div>');
+
+        // Card 4: OneDrive link (optional or required, only when enabled on the assignment).
+        $onedrivesetting = (int)$this->get_config('onedrivelinkenabled');
+        if ($onedrivesetting > ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED) {
+            $onedriverequired = ($onedrivesetting === ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED);
+            $cardclass = $onedriverequired ? 'submission_genaiuse_card_required' : 'submission_genaiuse_card_optional';
+            $cardbadge = $onedriverequired ? $requiredbadge : $optionalbadge;
+            $mform->addElement(
+                'html',
+                '<div class="card submission_genaiuse_card ' . $cardclass
+                . ' submission_genaiuse_card_collapsible mb-3">'
+                . $cardheader(get_string('onedrive', 'assignsubmission_genaiuse'), $cardbadge)
+                . '<div class="card-body">'
+            );
+
+            $onedrivechoiceradios = [];
+            $onedrivechoiceradios[] = $mform->createElement('radio', 'genaiuse_onedrivelink_choice', '', '', '');
+            $onedrivechoiceradios[] = $mform->createElement(
+                'radio',
+                'genaiuse_onedrivelink_choice',
+                '',
+                $radiocard(
+                    get_string('onedrivelink_yes_title', 'assignsubmission_genaiuse'),
+                    get_string('onedrivelink_yes_helper', 'assignsubmission_genaiuse')
+                ),
+                'yes'
+            );
+            // When a link is required, the "No" option must not be selectable. A static `disabled`
+            // attribute does not survive here: Moodle's form dependency JS owns the lock state of this
+            // hideIf group and strips `disabled` when it reveals the group (see lib/form/form.js
+            // _disableElement). Instead mark the card so styles.css can disable it via pointer-events,
+            // and set aria-disabled for assistive tech. The required-link form rule below is the real
+            // guard server-side.
+            $noradioattrs = $onedriverequired
+                ? ['class' => 'submission_genaiuse_radiocard_disabled', 'aria-disabled' => 'true']
+                : [];
+            $onedrivechoiceradios[] = $mform->createElement(
+                'radio',
+                'genaiuse_onedrivelink_choice',
+                '',
+                $radiocard(
+                    get_string('onedrivelink_no_title', 'assignsubmission_genaiuse'),
+                    get_string('onedrivelink_no_helper', 'assignsubmission_genaiuse')
+                ),
+                'no',
+                $noradioattrs
+            );
+            // When a link is required, add a small muted note explaining why the "No" card is greyed
+            // out. It is a static group element (a full-width flex item, see styles.css) rather than
+            // content inside the disabled radio label, so it renders at full strength below the cards
+            // instead of inheriting the card's greyed-out styling. Being part of the group, it hides
+            // and shows with the cards via the group's hideIf rule below.
+            if ($onedriverequired) {
+                $onedrivechoiceradios[] = $mform->createElement(
+                    'static',
+                    'genaiuse_onedrivelink_no_disabled_note',
+                    '',
+                    \html_writer::div(
+                        get_string('onedrivelink_no_disabled', 'assignsubmission_genaiuse'),
+                        'submission_genaiuse_radio_disabled_note'
+                    )
+                );
+            }
+            $mform->addGroup(
+                $onedrivechoiceradios,
+                'genaiuse_onedrivelink_choice_group',
+                get_string('onedrivelink_choice_label', 'assignsubmission_genaiuse'),
+                '',
+                false,
+                ['class' => 'submission_genaiuse_radiocards']
+            );
+            $mform->hideIf('genaiuse_onedrivelink_choice_group', 'genaiuse_aiused', 'eq', '');
+
+            $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
+            $onedriveelements = [];
+
+            $onedriveelements[] = $mform->createElement(
+                'text',
+                'genaiuse_onedrivelink',
+                '',
+                ['size' => 60]
+            );
+            $mform->setType('genaiuse_onedrivelink', PARAM_URL);
+
+            if (!empty($assistanceurl)) {
+                $onedriveelements[] = $mform->createElement(
+                    'static',
+                    'genaiuse_onedrivelink_assistance',
+                    '',
+                    \html_writer::link(
+                        $assistanceurl,
+                        get_string('onedriveassistance_link', 'assignsubmission_genaiuse'),
+                        ['target' => '_blank', 'rel' => 'noopener noreferrer']
+                    )
+                );
+            }
+
+            $mform->addGroup(
+                $onedriveelements,
+                'genaiuse_onedrivelink_group',
+                get_string('onedrivelink', 'assignsubmission_genaiuse'),
+                '<div class="w-100"></div>',
+                false
+            );
+            $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
+            $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_onedrivelink_choice', 'neq', 'yes');
+
+            // Required acknowledgement that the student has shared their OneDrive link with version
+            // history. Only added when the assignment opts in. Same presentation (full-width card,
+            // see styles.css) as the AI-use acknowledgement, and shown only once an AI-use choice is
+            // made and the student has chosen to provide a link.
+            if (!empty($this->get_config('onedrivehistoryack'))) {
+                $mform->addElement(
+                    'advcheckbox',
+                    'genaiuse_onedrivehistory_ack',
+                    '',
+                    get_string('onedrivehistoryack_confirm', 'assignsubmission_genaiuse'),
+                    ['class' => 'submission_genaiuse_full_row']
+                );
+                $mform->setType('genaiuse_onedrivehistory_ack', PARAM_INT);
+                $mform->hideIf('genaiuse_onedrivehistory_ack', 'genaiuse_aiused', 'eq', '');
+                $mform->hideIf('genaiuse_onedrivehistory_ack', 'genaiuse_onedrivelink_choice', 'neq', 'yes');
+            }
+
+            // Pre-select choice on edit from the saved value. Pre-2026050501 records have NULL here;
+            // fall back to the link presence so legacy submissions still load as "yes".
+            if ($existingrecord) {
+                $legacychoice = empty($existingrecord->onedrivelink) ? '' : 'yes';
+                $data->genaiuse_onedrivelink_choice = $existingrecord->onedrivelinkchoice ?: $legacychoice;
+                // Pre-tick the OneDrive history acknowledgement on edit — required whenever shown.
+                $data->genaiuse_onedrivehistory_ack = 1;
+            } else if ($onedriverequired) {
+                $mform->setDefault('genaiuse_onedrivelink_choice', 'yes');
+            } else {
+                $mform->setDefault('genaiuse_onedrivelink_choice', '');
+            }
+
+            $mform->addElement('html', '</div></div>');
+        }
+
+        // Card 5: Supporting evidence (optional). Yes/No radio cards reveal the file manager.
         $mform->addElement(
             'html',
             '<div class="card submission_genaiuse_card submission_genaiuse_card_optional'
@@ -746,133 +901,17 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $mform->addElement('html', '</div></div>');
 
-        // Card 4: OneDrive link (optional or required, only when enabled on the assignment).
-        $onedrivesetting = (int)$this->get_config('onedrivelinkenabled');
-        if ($onedrivesetting > ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED) {
-            $onedriverequired = ($onedrivesetting === ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED);
-            $cardclass = $onedriverequired ? 'submission_genaiuse_card_required' : 'submission_genaiuse_card_optional';
-            $cardbadge = $onedriverequired ? $requiredbadge : $optionalbadge;
-            $mform->addElement(
-                'html',
-                '<div class="card submission_genaiuse_card ' . $cardclass
-                . ' submission_genaiuse_card_collapsible mb-3">'
-                . $cardheader(get_string('onedrive', 'assignsubmission_genaiuse'), $cardbadge)
-                . '<div class="card-body">'
-            );
-
-            $onedrivechoiceradios = [];
-            $onedrivechoiceradios[] = $mform->createElement('radio', 'genaiuse_onedrivelink_choice', '', '', '');
-            $onedrivechoiceradios[] = $mform->createElement(
-                'radio',
-                'genaiuse_onedrivelink_choice',
-                '',
-                $radiocard(
-                    get_string('onedrivelink_yes_title', 'assignsubmission_genaiuse'),
-                    get_string('onedrivelink_yes_helper', 'assignsubmission_genaiuse')
-                ),
-                'yes'
-            );
-            // When a link is required, the "No" option must not be selectable. A static `disabled`
-            // attribute does not survive here: Moodle's form dependency JS owns the lock state of this
-            // hideIf group and strips `disabled` when it reveals the group (see lib/form/form.js
-            // _disableElement). Instead mark the card so styles.css can disable it via pointer-events,
-            // and set aria-disabled for assistive tech. The required-link form rule below is the real
-            // guard server-side.
-            $noradioattrs = $onedriverequired
-                ? ['class' => 'submission_genaiuse_radiocard_disabled', 'aria-disabled' => 'true']
-                : [];
-            $onedrivechoiceradios[] = $mform->createElement(
-                'radio',
-                'genaiuse_onedrivelink_choice',
-                '',
-                $radiocard(
-                    get_string('onedrivelink_no_title', 'assignsubmission_genaiuse'),
-                    get_string('onedrivelink_no_helper', 'assignsubmission_genaiuse')
-                ),
-                'no',
-                $noradioattrs
-            );
-            $mform->addGroup(
-                $onedrivechoiceradios,
-                'genaiuse_onedrivelink_choice_group',
-                get_string('onedrivelink_choice_label', 'assignsubmission_genaiuse'),
-                '',
-                false,
-                ['class' => 'submission_genaiuse_radiocards']
-            );
-            $mform->hideIf('genaiuse_onedrivelink_choice_group', 'genaiuse_aiused', 'eq', '');
-
-            $assistanceurl = get_config('assignsubmission_genaiuse', 'onedriveassistance');
-            $onedriveelements = [];
-
-            $onedriveelements[] = $mform->createElement(
-                'text',
-                'genaiuse_onedrivelink',
-                '',
-                ['size' => 60]
-            );
-            $mform->setType('genaiuse_onedrivelink', PARAM_URL);
-
-            if (!empty($assistanceurl)) {
-                $onedriveelements[] = $mform->createElement(
-                    'static',
-                    'genaiuse_onedrivelink_assistance',
-                    '',
-                    \html_writer::link(
-                        $assistanceurl,
-                        get_string('onedriveassistance_link', 'assignsubmission_genaiuse'),
-                        ['target' => '_blank', 'rel' => 'noopener noreferrer']
-                    )
-                );
-            }
-
-            $mform->addGroup(
-                $onedriveelements,
-                'genaiuse_onedrivelink_group',
-                get_string('onedrivelink', 'assignsubmission_genaiuse'),
-                '<div class="w-100"></div>',
-                false
-            );
-            $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_aiused', 'eq', '');
-            $mform->hideIf('genaiuse_onedrivelink_group', 'genaiuse_onedrivelink_choice', 'neq', 'yes');
-
-            // Pre-select choice on edit from the saved value. Pre-2026050501 records have NULL here;
-            // fall back to the link presence so legacy submissions still load as "yes".
-            if ($existingrecord) {
-                $legacychoice = empty($existingrecord->onedrivelink) ? '' : 'yes';
-                $data->genaiuse_onedrivelink_choice = $existingrecord->onedrivelinkchoice ?: $legacychoice;
-            } else if ($onedriverequired) {
-                $mform->setDefault('genaiuse_onedrivelink_choice', 'yes');
-            } else {
-                $mform->setDefault('genaiuse_onedrivelink_choice', '');
-            }
-
-            $mform->addElement('html', '</div></div>');
-        }
-
-        // Conditional validation: AI detail fields are only required when AI is used. The
-        // selected tool use method must include content (non-empty editor text or at least
-        // one uploaded file). The acknowledgement, evidence, and OneDrive choice fields are
-        // required whenever an aiused option has been picked.
+        // Conditional validation: when AI is used the selected tool use method must include content
+        // (non-empty editor text or at least one uploaded file). The acknowledgement, evidence, and
+        // OneDrive choice fields are required whenever an aiused option has been picked.
         $onedrivesettingval = (int)$this->get_config('onedrivelinkenabled');
         $onedriveenabled = $onedrivesettingval > ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_DISABLED;
         $onedriverequiredval = $onedrivesettingval === ASSIGNSUBMISSION_GENAIUSE_ONEDRIVELINK_REQUIRED;
-        $mform->addFormRule(function ($values) use ($requiredrule, $onedriveenabled, $onedriverequiredval) {
+        $onedrivehistoryackval = $onedriveenabled && !empty($this->get_config('onedrivehistoryack'));
+        $mform->addFormRule(function ($values) use ($onedriveenabled, $onedriverequiredval, $onedrivehistoryackval) {
             $errors = [];
             $aiused = $values['genaiuse_aiused'] ?? '';
             if ((int)$aiused === ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
-                foreach (
-                    [
-                    'genaiuse_aitoolsused',
-                    'genaiuse_aiusecontext',
-                    'genaiuse_aicontentdesc',
-                    'genaiuse_aimodification',
-                    ] as $field
-                ) {
-                    if (empty(trim($values[$field] ?? ''))) {
-                        $errors[$field] = $requiredrule;
-                    }
-                }
                 $toolusemethod = (string)($values['genaiuse_tooluse_method'] ?? '');
                 if ($toolusemethod === '') {
                     $errors['genaiuse_tooluse_method_group'] =
@@ -906,6 +945,15 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 if ($onedriverequiredval && empty(trim($values['genaiuse_onedrivelink'] ?? ''))) {
                     $errors['genaiuse_onedrivelink_group'] =
                         get_string('onedrivelink_required', 'assignsubmission_genaiuse');
+                }
+                // Only required when the checkbox is actually shown — i.e. the student is supplying a link.
+                if (
+                    $onedrivehistoryackval
+                    && ($values['genaiuse_onedrivelink_choice'] ?? '') === 'yes'
+                    && empty($values['genaiuse_onedrivehistory_ack'])
+                ) {
+                    $errors['genaiuse_onedrivehistory_ack'] =
+                        get_string('onedrivehistoryack_required', 'assignsubmission_genaiuse');
                 }
             }
             return empty($errors) ? true : $errors;
@@ -984,10 +1032,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
         $record->aiused = $aiused;
 
         if ($record->aiused == ASSIGNSUBMISSION_GENAIUSE_AI_USED) {
-            $record->aitoolsused = $data->genaiuse_aitoolsused ?? '';
-            $record->aiusecontext = $data->genaiuse_aiusecontext ?? '';
-            $record->aicontentdesc = $data->genaiuse_aicontentdesc ?? '';
-            $record->aimodification = $data->genaiuse_aimodification ?? '';
             if ($method === 'text') {
                 $tooluseraw = $data->genaiuse_tooluse_editor ?? null;
                 $record->tooluse = is_array($tooluseraw) ? ($tooluseraw['text'] ?? '') : ($tooluseraw ?? '');
@@ -995,10 +1039,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
                 $record->tooluse = '';
             }
         } else {
-            $record->aitoolsused = null;
-            $record->aiusecontext = null;
-            $record->aicontentdesc = null;
-            $record->aimodification = null;
             $record->tooluse = null;
         }
 
@@ -1102,10 +1142,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
 
         $context = [
             'aiused' => $aiused,
-            'aitoolsused' => s($record->aitoolsused),
-            'aiusecontext' => s($record->aiusecontext),
-            'aicontentdesc' => s($record->aicontentdesc),
-            'aimodification' => s($record->aimodification),
             'hastooluse' => !empty($record->tooluse),
             'tooluseformatted' => !empty($record->tooluse) ? format_text($record->tooluse, FORMAT_HTML) : '',
             'toolusefiles' => $aiused ? $this->assignment->render_area_files(
@@ -1266,10 +1302,6 @@ class assign_submission_genaiuse extends assign_submission_plugin {
     public function get_external_parameters() {
         return [
             'genaiuse_aiused' => new external_value(PARAM_INT, 'Whether AI was used (0 or 1).', VALUE_OPTIONAL),
-            'genaiuse_aitoolsused' => new external_value(PARAM_TEXT, 'AI tools used.', VALUE_OPTIONAL),
-            'genaiuse_aiusecontext' => new external_value(PARAM_TEXT, 'AI use context.', VALUE_OPTIONAL),
-            'genaiuse_aicontentdesc' => new external_value(PARAM_TEXT, 'AI content description.', VALUE_OPTIONAL),
-            'genaiuse_aimodification' => new external_value(PARAM_TEXT, 'AI output modification.', VALUE_OPTIONAL),
             'genaiuse_onedrivelink' => new external_value(PARAM_URL, 'OneDrive link to final submission.', VALUE_OPTIONAL),
         ];
     }

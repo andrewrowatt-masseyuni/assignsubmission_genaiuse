@@ -113,7 +113,7 @@
     flex-wrap: wrap;
     /* stylelint-disable-next-line declaration-no-important */
     align-items: stretch !important;
-    gap: 0.75rem;
+    gap: 0.1rem 0.75rem;
     width: 100%;
 }
 
@@ -160,6 +160,15 @@
     border-color: rgba(0, 0, 0, 0.15);
     background-color: rgba(0, 0, 0, 0.03);
     box-shadow: none;
+
+    background-image:
+        repeating-linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1) 1px,
+            transparent 1px,
+            transparent 12px
+        );
 }
 
 /* Visually hide the radio inputs themselves — keep them focusable for keyboard users. */
@@ -192,98 +201,51 @@
     line-height: 1.4;
 }
 
-/* Stack the AI-detail field labels above their textareas, full-width within the card body.
-   Targets are by fitem ID — Moodle propagates a `class` attr on form elements onto the wrapper
-   row, which would add an unwanted border, so a class-based selector is not safe here. */
-.mform #fitem_id_genaiuse_aitoolsused,
-.mform #fitem_id_genaiuse_aiusecontext,
-.mform #fitem_id_genaiuse_aicontentdesc,
-.mform #fitem_id_genaiuse_aimodification,
-.mform #fitem_id_genaiuse_ai_ack_text {
+/* Small muted note explaining why the "No" card is greyed out when a OneDrive link is required.
+   It is a static group element, so it sits as a sibling flex item alongside the radio cards rather
+   than inside the disabled label — meaning it renders at full strength (only the muted colour below
+   tones it down) instead of inheriting the card's greyed-out styling.
+
+   The two cards form an equal two-column row, each calc(50% - 0.375rem) wide (50% minus half the
+   0.75rem flex gap). Giving the note that same width plus margin-left: auto wraps it onto its own
+   line and parks it in the right column, so its left edge aligns with the "No" card directly above.
+   When the cards stack into a single column on narrow widths it stays right-aligned under them. */
+.mform .submission_genaiuse_radiocards .submission_genaiuse_radio_disabled_note {
+    flex: 0 0 calc(50% - 0.375rem);
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.3;
+}
+
+/* Stack the acknowledgement statics full-width within the card body. Targets are by fitem ID —
+   Moodle propagates a `class` attr on form elements onto the wrapper row, which would add an
+   unwanted border, so a class-based selector is not safe here. */
+.mform #fitem_id_genaiuse_ai_ack_text,
+.mform #fitem_id_genaiuse_noai_ack_text {
     display: block;
 }
 
-.mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
-.mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
-.mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
-.mform #fitem_id_genaiuse_aimodification > .col-md-3,
 .mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
-.mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
-.mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
-.mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
-.mform #fitem_id_genaiuse_aimodification > .col-md-9,
-.mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+.mform #fitem_id_genaiuse_noai_ack_text > .col-md-3,
+.mform #fitem_id_genaiuse_ai_ack_text > .col-md-9,
+.mform #fitem_id_genaiuse_noai_ack_text > .col-md-9 {
     flex: 0 0 100%;
     max-width: 100%;
     padding-left: 0;
     padding-right: 0;
 }
 
-/* On md+ indent both stacked rows by 25% so they line up with col-md-9 content
-   in sibling cards (e.g. the Tool use card). */
+/* On md+ indent the acknowledgement statics by 25% so they line up with col-md-9 content. */
 @media (min-width: 768px) {
-    .mform #fitem_id_genaiuse_aitoolsused > .col-md-3,
-    .mform #fitem_id_genaiuse_aiusecontext > .col-md-3,
-    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-3,
-    .mform #fitem_id_genaiuse_aimodification > .col-md-3,
-    .mform #fitem_id_genaiuse_aitoolsused_hint > .col-md-3,
-    .mform #fitem_id_genaiuse_aiusecontext_hint > .col-md-3,
-    .mform #fitem_id_genaiuse_aicontentdesc_hint > .col-md-3,
-    .mform #fitem_id_genaiuse_aimodification_hint > .col-md-3,
     .mform #fitem_id_genaiuse_ai_ack_text > .col-md-3,
-    .mform #fitem_id_genaiuse_aitoolsused > .col-md-9,
-    .mform #fitem_id_genaiuse_aiusecontext > .col-md-9,
-    .mform #fitem_id_genaiuse_aicontentdesc > .col-md-9,
-    .mform #fitem_id_genaiuse_aimodification > .col-md-9,
-    .mform #fitem_id_genaiuse_aitoolsused_hint > .col-md-9,
-    .mform #fitem_id_genaiuse_aiusecontext_hint > .col-md-9,
-    .mform #fitem_id_genaiuse_aicontentdesc_hint > .col-md-9,
-    .mform #fitem_id_genaiuse_aimodification_hint > .col-md-9,
-    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-9 {
+    .mform #fitem_id_genaiuse_noai_ack_text > .col-md-3,
+    .mform #fitem_id_genaiuse_ai_ack_text > .col-md-9,
+    .mform #fitem_id_genaiuse_noai_ack_text > .col-md-9 {
         flex: 0 0 75%;
         max-width: 75%;
         margin-left: 25%;
     }
-}
-
-.mform .submission_genaiuse_aifield_label {
-    font-weight: 500;
-}
-
-.mform .submission_genaiuse_aifield_hint {
-    font-size: 0.85rem;
-    color: rgba(0, 0, 0, 0.65);
-    line-height: 1.4;
-    border-left: 1px dashed #ced4da;
-    padding-left: 0.4rem;
-}
-
-/* Pull the hint up against its textarea — the field fitem's default
-   form-group margin-bottom (1rem) otherwise leaves an unwanted gap that
-   reads as separation rather than association. */
-.mform #fitem_id_genaiuse_aitoolsused_hint,
-.mform #fitem_id_genaiuse_aiusecontext_hint,
-.mform #fitem_id_genaiuse_aicontentdesc_hint,
-.mform #fitem_id_genaiuse_aimodification_hint {
-    margin-top: -0.75rem;
-    margin-bottom: 1rem;
-}
-
-/* Stretch the four AI textareas to the full width of the card body. The
-   parent .felement carries Bootstrap's .form-inline, which forces
-   .form-control to width: auto and falls back to the textarea's cols="60"
-   default — overriding back to 100% lets the field reach the right edge. */
-.mform #fitem_id_genaiuse_aitoolsused .form-control,
-.mform #fitem_id_genaiuse_aiusecontext .form-control,
-.mform #fitem_id_genaiuse_aicontentdesc .form-control,
-.mform #fitem_id_genaiuse_aimodification .form-control {
-    width: 100%;
-    /* Auto-grow from one row (rows="1" on the textarea) to a cap of five rows,
-       after which the native vertical scrollbar handles overflow. Unsupported
-       browsers (currently Safari) keep the fixed one-row height. */
-    /* stylelint-disable-next-line csstree/validator */ /* stylelint-disable-next-line property-no-unknown */
-    field-sizing: content;
-    max-height: calc(5lh + 0.75rem);
 }
 
 /* No-label row utility — apply by passing
@@ -335,7 +297,10 @@
    plain .felement fallback) so the selectors find it via :has() on the input. */
 .mform .checkbox:has(> label > #id_genaiuse_ack_confirmed),
 .mform .form-check:has(> #id_genaiuse_ack_confirmed),
-.mform .felement:has(> #id_genaiuse_ack_confirmed) {
+.mform .felement:has(> #id_genaiuse_ack_confirmed),
+.mform .checkbox:has(> label > #id_genaiuse_onedrivehistory_ack),
+.mform .form-check:has(> #id_genaiuse_onedrivehistory_ack),
+.mform .felement:has(> #id_genaiuse_onedrivehistory_ack) {
     padding: 0.75rem 1rem;
     border: 2px solid #dc3545;
     border-radius: 0.5rem;
@@ -345,7 +310,10 @@
 
 .mform .checkbox:has(> label > #id_genaiuse_ack_confirmed:checked),
 .mform .form-check:has(> #id_genaiuse_ack_confirmed:checked),
-.mform .felement:has(> #id_genaiuse_ack_confirmed:checked) {
+.mform .felement:has(> #id_genaiuse_ack_confirmed:checked),
+.mform .checkbox:has(> label > #id_genaiuse_onedrivehistory_ack:checked),
+.mform .form-check:has(> #id_genaiuse_onedrivehistory_ack:checked),
+.mform .felement:has(> #id_genaiuse_onedrivehistory_ack:checked) {
     border-color: #0d6efd;
     background-color: #e7f1ff;
     box-shadow: inset 0 0 0 1px #0d6efd;
@@ -353,7 +321,10 @@
 
 .mform .checkbox:has(> label > #id_genaiuse_ack_confirmed) > label,
 .mform .form-check:has(> #id_genaiuse_ack_confirmed) > label,
-.mform .felement:has(> #id_genaiuse_ack_confirmed) > label {
+.mform .felement:has(> #id_genaiuse_ack_confirmed) > label,
+.mform .checkbox:has(> label > #id_genaiuse_onedrivehistory_ack) > label,
+.mform .form-check:has(> #id_genaiuse_onedrivehistory_ack) > label,
+.mform .felement:has(> #id_genaiuse_onedrivehistory_ack) > label {
     font-weight: 500;
     margin-bottom: 0;
 }
@@ -561,22 +532,16 @@
     }
 }
 
-/* AI-detail fields keep the special "stack label above, indent 25% on md+"
-   layout. The existing rules (lines 159-200 of styles.css) target the modern
-   col-md-3/col-md-9 children; these mirror them for the legacy children. */
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text {
+/* The acknowledgement statics keep the special "stack label above, indent 25% on md+"
+   layout. The modern col-md-3/col-md-9 rules are above; these mirror them for the
+   legacy felement children. */
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_noai_ack_text {
     display: block;
 }
 
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused > div,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext > div,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc > div,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification > div,
-.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div {
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div,
+.mform .submission_genaiuse .form-group#fitem_id_genaiuse_noai_ack_text > div {
     flex: 0 0 100%;
     max-width: 100%;
     width: 100%;
@@ -585,11 +550,8 @@
 }
 
 @media (min-width: 768px) {
-    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aitoolsused > div,
-    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aiusecontext > div,
-    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aicontentdesc > div,
-    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_aimodification > div,
-    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div {
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_ai_ack_text > div,
+    .mform .submission_genaiuse .form-group#fitem_id_genaiuse_noai_ack_text > div {
         flex: 0 0 75%;
         max-width: 75%;
         margin-left: 25%;

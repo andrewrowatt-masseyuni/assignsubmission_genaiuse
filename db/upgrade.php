@@ -83,5 +83,26 @@ function xmldb_assignsubmission_genaiuse_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026050501, 'assignsubmission', 'genaiuse');
     }
 
+    if ($oldversion < 2026060302) {
+        $table = new xmldb_table('assignsubmission_genaiuse');
+
+        // The four free-text AI detail fields are no longer collected on the submission form.
+        foreach (['aitoolsused', 'aiusecontext', 'aicontentdesc', 'aimodification'] as $fieldname) {
+            $field = new xmldb_field($fieldname);
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // The acknowledgement setting was renamed; carry any configured value across to the new key.
+        $existing = get_config('assignsubmission_genaiuse', 'genaiuse_aiuseacknowledgementextra');
+        if ($existing !== false) {
+            set_config('aiuseacknowledgementaiused', $existing, 'assignsubmission_genaiuse');
+            unset_config('genaiuse_aiuseacknowledgementextra', 'assignsubmission_genaiuse');
+        }
+
+        upgrade_plugin_savepoint(true, 2026060302, 'assignsubmission', 'genaiuse');
+    }
+
     return true;
 }
