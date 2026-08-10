@@ -130,6 +130,12 @@ class provider implements
                     ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
                     $submission->id
                 )
+                ->export_area_files(
+                    $currentpath,
+                    'assignsubmission_genaiuse',
+                    ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
+                    $submission->id
+                )
                 ->export_data($currentpath, $submissiondata);
         }
     }
@@ -147,6 +153,11 @@ class provider implements
             $requestdata->get_context()->id,
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA
+        );
+        $fs->delete_area_files(
+            $requestdata->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE
         );
 
         $DB->delete_records('assignsubmission_genaiuse', ['assignment' => $requestdata->get_assignid()]);
@@ -167,6 +178,12 @@ class provider implements
             $deletedata->get_context()->id,
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+            $submissionid
+        );
+        $fs->delete_area_files(
+            $deletedata->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
             $submissionid
         );
 
@@ -194,6 +211,13 @@ class provider implements
             $deletedata->get_context()->id,
             'assignsubmission_genaiuse',
             ASSIGNSUBMISSION_GENAIUSE_FILEAREA,
+            $sql,
+            $params
+        );
+        $fs->delete_area_files_select(
+            $deletedata->get_context()->id,
+            'assignsubmission_genaiuse',
+            ASSIGNSUBMISSION_GENAIUSE_FILEAREA_TOOLUSE,
             $sql,
             $params
         );

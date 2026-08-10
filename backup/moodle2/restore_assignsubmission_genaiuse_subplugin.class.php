@@ -56,5 +56,6 @@ class restore_assignsubmission_genaiuse_subplugin extends restore_subplugin {
         $DB->insert_record('assignsubmission_genaiuse', $data);
 
         $this->add_related_files('assignsubmission_genaiuse', 'submission_evidence', 'submission', null, $oldsubmissionid);
+        $this->add_related_files('assignsubmission_genaiuse', 'submission_tooluse', 'submission', null, $oldsubmissionid);
     }
 }
