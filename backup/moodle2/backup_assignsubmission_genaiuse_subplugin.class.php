@@ -45,8 +45,9 @@ class backup_assignsubmission_genaiuse_subplugin extends backup_subplugin {
         // Set source to populate the data.
         $subpluginelement->set_source_table('assignsubmission_genaiuse', ['submission' => backup::VAR_PARENTID]);
 
-        // Annotate evidence files.
+        // Annotate evidence and tool use files.
         $subpluginelement->annotate_files('assignsubmission_genaiuse', 'submission_evidence', 'submission');
+        $subpluginelement->annotate_files('assignsubmission_genaiuse', 'submission_tooluse', 'submission');
 
         return $subplugin;
     }
