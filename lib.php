@@ -23,7 +23,7 @@
  */
 
 /**
- * Serves assignment submission evidence files.
+ * Serves assignment submission evidence, tool use and template files.
  *
  * @param mixed $course course or id of the course
  * @param mixed $cm course module or id of the course module
@@ -45,7 +45,8 @@ function assignsubmission_genaiuse_pluginfile(
 ) {
     global $DB, $CFG;
 
-    if ($filearea !== 'submission_evidence' && $filearea !== 'submission_template') {
+    $validfileareas = ['submission_evidence', 'submission_tooluse', 'submission_template'];
+    if (!in_array($filearea, $validfileareas, true)) {
         return false;
     }
 
